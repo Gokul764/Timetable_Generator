@@ -1,10 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { DashboardSidebar } from "./dashboard-sidebar";
-import { MobileNav } from "./mobile-nav";
-
-const ALLOWED_ROLES = ["super_admin", "admin", "faculty", "student"] as const;
+import { DashboardHeader } from "./dashboard-header";
 
 export default async function DashboardLayout({
   children,
@@ -24,9 +21,12 @@ export default async function DashboardLayout({
     <div className="min-h-screen bg-background">
       <MobileNav role={userRole} />
       <DashboardSidebar role={userRole} />
-      <main className="md:pl-64 min-h-screen">
-        <div className="container py-8 px-4 md:px-6">{children}</div>
-      </main>
+      <div className="md:pl-64 flex flex-col min-h-screen">
+        <DashboardHeader />
+        <main className="flex-1 mt-16">
+          <div className="container py-8 px-4 md:px-6">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

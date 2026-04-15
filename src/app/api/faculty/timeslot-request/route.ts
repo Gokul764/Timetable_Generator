@@ -21,15 +21,44 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid day or time" }, { status: 400 });
   }
 
-  await prisma.facultyTimeslotRequest.create({
+  const faculty = await prisma.faculty.findUnique({
+    where: { id: facultyId as string },
+    include: { user: true }
+  });
+
+  if (!faculty) {
+    return NextResponse.json({ error: "Faculty not found" }, { status: 404 });
+  }
+
+  const request = await prisma.facultyTimeslotRequest.create({
     data: {
       facultyId: facultyId as string,
       dayOfWeek,
       startTime: String(startTime),
       endTime: String(endTime),
       reason: reason ?? null,
-      status: status === "approved" ? "approved" : "pending",
+      status: "pending", // Always pending initially now
     },
   });
-  return NextResponse.json({ ok: true });
+
+  // Notify Admins in the same department
+  const admins = await prisma.user.findMany({
+    where: {
+      role: "admin",
+      departmentId: faculty.departmentId,
+    },
+  });
+
+  if (admins.length > 0) {
+    await prisma.notification.createMany({
+      data: admins.map((admin) => ({
+        userId: admin.id,
+        title: "New Faculty Constraint",
+        message: `${faculty.user.name} has submitted a new ${reason?.includes("[UNAVAILABLE]") ? "unavailability block" : "preference"}.`,
+        type: "INFO",
+      })),
+    });
+  }
+
+  return NextResponse.json({ ok: true, requestId: request.id });
 }

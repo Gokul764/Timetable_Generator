@@ -20,6 +20,7 @@ model User {
   department    Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   facultyProfile Faculty?
   studentProfile Student?
+  notifications  Notification[]
 }
 
 model Department {
@@ -175,4 +176,16 @@ model FacultyTimeslotRequest {
   updatedAt    DateTime @updatedAt
 
   faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO | SUCCESS | ALERT | ERROR
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

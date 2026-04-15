@@ -488,11 +488,15 @@ export async function generateTimetableForDepartment(
     }
   }
 
-  return timetableId;
+  return {
+    timetableId,
+    success: (bestChromosome?.hardViolations ?? 0) === 0,
+    hardViolations: bestChromosome?.hardViolations ?? 0,
+  };
 }
 
 export async function generateAllYearsTimetable(departmentId: string, semesterType?: 'odd' | 'even') {
-  const ids: string[] = [];
+  const results: any[] = [];
 
   // Shared state across all years/semesters in THIS department
   const sharedState = {
@@ -507,9 +511,9 @@ export async function generateAllYearsTimetable(departmentId: string, semesterTy
       : allSemesters;
 
     for (const sem of targetSemesters) {
-      const id = await generateTimetableForDepartment(departmentId, year, sem, sharedState);
-      ids.push(id);
+      const res = await generateTimetableForDepartment(departmentId, year, sem, sharedState);
+      results.push(res);
     }
   }
-  return ids;
+  return results;
 }

@@ -105,5 +105,16 @@ export async function PATCH(
     where: { id: requestId },
     data: { status },
   });
+
+  // Notify the Faculty member
+  await prisma.notification.create({
+    data: {
+      userId: reqRecord.faculty.userId,
+      title: `Constraint ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+      message: `Your request for ${reqRecord.startTime} on ${reqRecord.dayOfWeek} has been ${status}.`,
+      type: status === "approved" ? "SUCCESS" : "ERROR",
+    },
+  });
+
   return NextResponse.json({ ok: true });
 }

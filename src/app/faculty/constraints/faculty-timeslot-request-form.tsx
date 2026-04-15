@@ -49,8 +49,6 @@ export function FacultyTimeslotRequestForm({
           startTime,
           endTime,
           reason: fullReason,
-          // instantly auto-approve to remove admin manual step
-          status: "approved"
         }),
       });
       if (!res.ok) {
@@ -59,7 +57,7 @@ export function FacultyTimeslotRequestForm({
         return;
       }
       setReason("");
-      alert("Request submitted successfully and automatically approved!");
+      alert("Request submitted successfully! The admin has been notified and will review it shortly.");
       router.refresh();
     } finally {
       setLoading(false);
