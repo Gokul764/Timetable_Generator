@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  passwordHash  String
+  role          String    // super_admin | admin | faculty | student
+  departmentId  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  department    Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  facultyProfile Faculty?
+  studentProfile Student?
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  rooms     Room[]
+  faculty   Faculty[]
+  students  Student[]
+  timetables Timetable[]
+  roomRequestsSent     RoomRequest[] @relation("RequestingDepartment")
+  roomRequestsReceived RoomRequest[] @relation("OwningDepartment")
+  subjects     Subject[]
+}
+
+model Room {
+  id           String   @id @default(cuid())
+  name         String
+  code         String   @unique
+  capacity     Int      @default(30)
+  departmentId String
+  type         String   @default("classroom") // classroom | lab | seminar_hall
+  isAvailable  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  slots      TimetableSlot[]
+  roomRequests RoomRequest[]
+}
+
+model Faculty {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  departmentId String
+  employeeId String?
+  designation String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  timeslotRequests FacultyTimeslotRequest[]
+  slots      TimetableSlot[]
+  subjects   Subject[]
+}
+
+model Student {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  departmentId String
+  year         Int      // 1-4
+  rollNo       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  subjects   Subject[]
+}
+
+model Timetable {
+  id           String   @id @default(cuid())
+  departmentId String
+  year         Int      // 1-4
+  semester     Int      @default(1)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  slots       TimetableSlot[]
+}
+
+model TimetableSlot {
+  id           String   @id @default(cuid())
+  timetableId  String
+  roomId       String
+  facultyId    String
+  subjectId    String? // Made optional temporarily for migration, but we should fill it. Actually, for new schema, let's make it required as per goal, but we are resetting DB.
+  dayOfWeek    Int      // 0-4 Mon-Fri
+  startTime    String   // "09:00"
+  endTime      String   // "10:00"
+  type         String   @default("theory") // "theory" or "lab"
+  studentCount Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  timetable Timetable @relation(fields: [timetableId], references: [id], onDelete: Cascade)
+  room      Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  faculty   Faculty   @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  subject   Subject?  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+model Subject {
+  id           String   @id @default(cuid())
+  name         String
+  code         String
+  departmentId String
+  year         Int      // 1-4
+  semester     Int      // 1-8
+  isActive     Boolean  @default(true)
+  classesPerWeek Int      @default(3)
+  isLab        Boolean  @default(false)
+  labSessionsPerWeek Int  @default(0)
+  isHonor      Boolean  @default(false)
+  isMinor      Boolean  @default(false)
+  isAddOn      Boolean  @default(false)
+  isProfessionalElective Boolean @default(false)
+  isOpenElective Boolean  @default(false)
+  isCore       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  slots      TimetableSlot[]
+  faculty    Faculty[]
+  students   Student[]
+  
+  @@unique([code, departmentId]) // Codes might repeat across depts? Maybe not. But unique within dept is safer.
+}
+
+model RoomRequest {
+  id              String   @id @default(cuid())
+  requestingDeptId String
+  owningDeptId     String
+  roomId          String
+  reason          String?
+  status          String   @default("pending") // pending | approved | rejected
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  requestingDepartment Department @relation("RequestingDepartment", fields: [requestingDeptId], references: [id], onDelete: Cascade)
+  owningDepartment     Department @relation("OwningDepartment", fields: [owningDeptId], references: [id], onDelete: Cascade)
+  room                 Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model FacultyTimeslotRequest {
+  id           String   @id @default(cuid())
+  facultyId    String
+  targetSlotId String?
+  dayOfWeek    Int
+  startTime    String
+  endTime      String
+  reason       String?
+  status       String   @default("pending") // pending | approved | rejected
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,1 @@
+﻿src/lib/timetable-generator.ts(145,24): error TS2304: Cannot find name 'id'.
