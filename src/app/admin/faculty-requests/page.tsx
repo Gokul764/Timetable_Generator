@@ -82,7 +82,7 @@ export default async function AdminFacultyRequestsPage() {
                 <TableHead>Time</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right min-w-[320px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -94,11 +94,13 @@ export default async function AdminFacultyRequestsPage() {
                 </TableRow>
               ) : (
                 requests.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="font-medium">{r.faculty.user.name}</TableCell>
+                  <TableRow key={r.id} className="group transition-colors hover:bg-muted/30">
+                    <TableCell className="font-bold">{r.faculty.user.name}</TableCell>
                     <TableCell>{DAYS[r.dayOfWeek] ?? r.dayOfWeek}</TableCell>
-                    <TableCell>{r.startTime} – {r.endTime}</TableCell>
-                    <TableCell className="max-w-[200px] truncate">{r.reason ?? "—"}</TableCell>
+                    <TableCell className="font-medium text-blue-700">{r.startTime} – {r.endTime}</TableCell>
+                    <TableCell className="max-w-[300px] text-sm text-muted-foreground italic">
+                      {r.reason || "No reason provided"}
+                    </TableCell>
                     <TableCell>
                       <Badge
                         variant={
@@ -108,14 +110,17 @@ export default async function AdminFacultyRequestsPage() {
                               ? "destructive"
                               : "warning"
                         }
+                        className="capitalize transition-all"
                       >
                         {r.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      {r.status === "pending" && (
-                        <FacultyRequestActions requestId={r.id} />
-                      )}
+                      <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                        {r.status === "pending" && (
+                          <FacultyRequestActions requestId={r.id} />
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

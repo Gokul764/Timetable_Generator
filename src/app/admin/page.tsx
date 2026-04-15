@@ -9,13 +9,16 @@ import {
     BookOpen, 
     AlertCircle,
     CheckCircle2,
-    ArrowRight
+    ArrowRight,
+    Wand2
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { FacultyRequestActions } from "./faculty-requests/faculty-request-actions";
+import { DAYS } from "@/lib/utils";
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
@@ -42,7 +45,8 @@ export default async function AdminDashboard() {
       studentCount, 
       facultyCount, 
       subjectCount, 
-      roomCount
+      roomCount,
+      pendingRequests
   ] = await Promise.all([
     prisma.timetable.findMany({
       where: { departmentId },
@@ -57,6 +61,12 @@ export default async function AdminDashboard() {
     prisma.faculty.count({ where: { departmentId } }),
     prisma.subject.count({ where: { departmentId } }),
     prisma.room.count({ where: { departmentId } }),
+    prisma.facultyTimeslotRequest.findMany({
+        where: { faculty: { departmentId }, status: "pending" },
+        include: { faculty: { include: { user: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 3
+    })
   ]);
 
   // Logical Health Check
@@ -111,7 +121,7 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* Schedule Status */}
+        {/* Schedule Status (Stability) */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Schedule Stability</CardTitle>
@@ -121,7 +131,7 @@ export default async function AdminDashboard() {
             <div className="grid gap-3 sm:grid-cols-2">
                 {ttStatus.map((tt) => (
                     <Link key={tt.id} href={`/admin/timetable/${tt.id}`}>
-                        <div className="flex items-center justify-between p-3 rounded-xl border bg-card hover:bg-accent/50 transition-colors">
+                        <div className="flex items-center justify-between p-3 rounded-xl border bg-card hover:bg-accent/50 transition-colors text-left w-full cursor-pointer">
                             <div className="space-y-0.5">
                                 <p className="text-sm font-bold">Year {tt.year} · Sem {tt.semester}</p>
                                 <p className="text-xs text-muted-foreground">Main Schedule</p>
@@ -149,7 +159,7 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
+        {/* Quick Actions (Resource Mgmt) */}
         <Card>
           <CardHeader>
             <CardTitle>Resource Mgmt</CardTitle>
@@ -162,6 +172,7 @@ export default async function AdminDashboard() {
                 { label: "Student Registry", href: "/admin/students", icon: GraduationCap },
                 { label: "Campus Rooms", href: "/admin/rooms", icon: Building2 },
                 { label: "Department Subjects", href: "/admin/subjects", icon: BookOpen },
+                { label: "Faculty Constraints", href: "/admin/faculty-requests", icon: Wand2 },
             ].map((action) => (
                 <Link key={action.label} href={action.href} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "justify-start w-full text-sm font-medium group")}>
                     <action.icon className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -171,6 +182,53 @@ export default async function AdminDashboard() {
             ))}
           </CardContent>
         </Card>
+
+        {/* Pending Constraints Widget (Full Width conditionally) */}
+        {pendingRequests.length > 0 && (
+          <Card className="lg:col-span-3 border-purple-200 bg-purple-50/10 shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-purple-700 flex items-center gap-2">
+                  <Wand2 className="h-5 w-5" />
+                  Action Required: Pending Constraints
+                </CardTitle>
+                <CardDescription>Verify these requests to re-generate the timetable automatically</CardDescription>
+              </div>
+              <Link href="/admin/faculty-requests" className="text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors flex items-center gap-1">
+                View all requests <ArrowRight className="h-3 w-3" />
+              </Link>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {pendingRequests.map((req) => (
+                  <div key={req.id} className="flex flex-col md:flex-row md:items-center justify-between p-5 rounded-2xl border bg-white border-purple-100 shadow-sm hover:shadow-md transition-shadow gap-6 group">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold">
+                           {req.faculty.user.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-900">{req.faculty.user.name}</p>
+                          <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
+                            {DAYS[req.dayOfWeek]} @ {req.startTime}
+                          </Badge>
+                        </div>
+                      </div>
+                      {req.reason && (
+                        <p className="text-sm text-gray-500 italic pl-1.5 border-l-2 border-purple-200 ml-5 py-0.5">
+                          "{req.reason}"
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex-shrink-0">
+                      <FacultyRequestActions requestId={req.id} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
