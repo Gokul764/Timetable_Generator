@@ -376,7 +376,13 @@ export async function generateTimetableForDepartment(
     }
   }
 
-  if (requirements.length === 0) return timetableId;
+  if (requirements.length === 0) {
+    return {
+      timetableId,
+      success: true,
+      hardViolations: 0,
+    };
+  }
 
   // GENETIC ALGORITHM EXECUTION
   let population = initializePopulation(POPULATION_SIZE, requirements.length);

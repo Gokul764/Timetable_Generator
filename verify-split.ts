@@ -27,7 +27,7 @@ async function verifySplit() {
 
     // 2. Run Generator
     console.log("Running generator...");
-    const timetableId = await generateTimetableForDepartment(dept.id, year, 1);
+    const { timetableId } = await generateTimetableForDepartment(dept.id, year, 1);
     console.log("Generated Timetable ID:", timetableId);
 
     // 3. Verify Splits

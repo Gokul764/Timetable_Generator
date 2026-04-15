@@ -25,7 +25,7 @@ async function verifySplitWithRealData() {
 
     // Generate
     console.log("Generating timetable for CSE Year 3...");
-    const timetableId = await generateTimetableForDepartment(dept.id, year, 1);
+    const { timetableId } = await generateTimetableForDepartment(dept.id, year, 1);
     console.log("Generated Timetable ID:", timetableId);
 
     // Analyze Slots
