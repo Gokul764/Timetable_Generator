@@ -22,7 +22,10 @@ export default async function AdminFacultyRequestsPage() {
 
   const requests = await prisma.facultyTimeslotRequest.findMany({
     where: { faculty: { departmentId } },
-    include: { faculty: { include: { user: true } } },
+    include: { 
+      faculty: { include: { user: true } },
+      targetSlot: { include: { subject: true } }
+    },
     orderBy: { createdAt: "desc" },
   });
 
