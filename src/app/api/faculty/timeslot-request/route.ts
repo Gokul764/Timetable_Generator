@@ -9,8 +9,8 @@ export async function POST(req: Request) {
   if (!facultyId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  const body = await req.json().catch(() => ({}));
-  const { dayOfWeek, startTime, endTime, reason, status } = body;
+  const { dayOfWeek, startTime, endTime, reason, targetSlotId } = body;
+  
   if (
     typeof dayOfWeek !== "number" ||
     dayOfWeek < 0 ||
@@ -30,6 +30,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Faculty not found" }, { status: 404 });
   }
 
+  // If a specific slot is being moved, verify it belongs to this faculty
+  if (targetSlotId) {
+    const slot = await prisma.timetableSlot.findFirst({
+      where: {
+        id: targetSlotId,
+        facultyId: facultyId as string,
+      },
+    });
+    if (!slot) {
+      return NextResponse.json({ error: "Invalid class selection" }, { status: 400 });
+    }
+  }
+
   const request = await prisma.facultyTimeslotRequest.create({
     data: {
       facultyId: facultyId as string,
@@ -37,9 +50,14 @@ export async function POST(req: Request) {
       startTime: String(startTime),
       endTime: String(endTime),
       reason: reason ?? null,
-      status: "pending", // Always pending initially now
+      targetSlotId: targetSlotId || null,
+      isMoveRequest: !!targetSlotId,
+      status: "pending",
     },
   });
+
+  // Notify Admins in the same department
+  const typeLabel = targetSlotId ? "move request" : (reason?.includes("[UNAVAILABLE]") ? "unavailability block" : "preference");
 
   // Notify Admins in the same department
   const admins = await prisma.user.findMany({
@@ -53,8 +71,8 @@ export async function POST(req: Request) {
     await prisma.notification.createMany({
       data: admins.map((admin) => ({
         userId: admin.id,
-        title: "New Faculty Constraint",
-        message: `${faculty.user.name} has submitted a new ${reason?.includes("[UNAVAILABLE]") ? "unavailability block" : "preference"}.`,
+        title: "New Faculty Request",
+        message: `${faculty.user.name} has submitted a new ${typeLabel}.`,
         type: "INFO",
       })),
     });

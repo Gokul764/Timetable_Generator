@@ -17,22 +17,113 @@ export async function POST(
   }
 
   const { requestId } = await params;
-
-  // 1. Fetch the request
   const facultyRequest = await prisma.facultyTimeslotRequest.findUnique({
     where: { id: requestId },
-    include: { faculty: { include: { user: true } } },
+    include: { 
+      faculty: { include: { user: true } },
+      targetSlot: { include: { subject: true, timetable: true } }
+    },
   });
 
   if (!facultyRequest || facultyRequest.faculty.departmentId !== departmentId) {
     return NextResponse.json({ error: "Request not found" }, { status: 404 });
   }
 
+  // logic for SMART MOVE
+  if (facultyRequest.isMoveRequest && facultyRequest.targetSlot) {
+    try {
+      const { targetSlot } = facultyRequest;
+      const targetDay = facultyRequest.dayOfWeek;
+      const targetStart = facultyRequest.startTime;
+      const targetEnd = facultyRequest.endTime;
+
+      // 1. Check Room Conflict
+      const roomConflict = await prisma.timetableSlot.findFirst({
+        where: {
+          roomId: targetSlot.roomId,
+          dayOfWeek: targetDay,
+          startTime: targetStart,
+          // Exclude the slot we are moving
+          NOT: { id: targetSlot.id }
+        },
+        include: { subject: true }
+      });
+
+      if (roomConflict) {
+        return NextResponse.json({ 
+          error: `Room conflict: ${roomConflict.subject?.name || "Another class"} is already scheduled in this room at the target time.` 
+        }, { status: 400 });
+      }
+
+      // 2. Check Student Group Conflict (Year/Sem/Dept)
+      const studentConflict = await prisma.timetableSlot.findFirst({
+        where: {
+          timetableId: targetSlot.timetableId,
+          dayOfWeek: targetDay,
+          startTime: targetStart,
+          NOT: { id: targetSlot.id }
+        },
+        include: { subject: true }
+      });
+
+      if (studentConflict) {
+        return NextResponse.json({ 
+          error: `Student conflict: This year group already has a ${studentConflict.subject?.name || "class"} at the target time.` 
+        }, { status: 400 });
+      }
+
+      // 3. Check Faculty Conflict (the requester themselves)
+      const facultyConflict = await prisma.timetableSlot.findFirst({
+        where: {
+          facultyId: facultyRequest.facultyId,
+          dayOfWeek: targetDay,
+          startTime: targetStart,
+          NOT: { id: targetSlot.id }
+        },
+        include: { subject: true }
+      });
+
+      if (facultyConflict) {
+        return NextResponse.json({ 
+          error: `Faculty conflict: You already have ${facultyConflict.subject?.name || "another class"} at the target time.` 
+        }, { status: 400 });
+      }
+
+      // NO CONFLICTS -> Apply Move directly
+      await prisma.$transaction([
+        prisma.timetableSlot.update({
+          where: { id: targetSlot.id },
+          data: {
+            dayOfWeek: targetDay,
+            startTime: targetStart,
+            endTime: targetEnd
+          }
+        }),
+        prisma.facultyTimeslotRequest.update({
+          where: { id: requestId },
+          data: { status: "approved" }
+        }),
+        prisma.notification.create({
+          data: {
+            userId: facultyRequest.faculty.userId,
+            title: "Move Request Approved",
+            message: `Your class ${targetSlot.subject?.name} has been moved to ${targetStart} on Day ${targetDay}.`,
+            type: "SUCCESS",
+          }
+        })
+      ]);
+
+      return NextResponse.json({ ok: true, message: "Class moved successfully! No global re-generation was needed." });
+
+    } catch (err) {
+      console.error("Smart Move Error:", err);
+      return NextResponse.json({ error: "Failed to apply move." }, { status: 500 });
+    }
+  }
+
+  // FALLBACK: Old GA Verification for general constraints
   try {
     // 2. Temporarily "approve" the request so the GA picks it up
-    // We use a transaction to ensure we can roll back if needed, 
-    // but GA itself does many DB operations. 
-    // To keep it simple, we'll mark it as approved, run GA, and then finalize.
     await prisma.facultyTimeslotRequest.update({
       where: { id: requestId },
       data: { status: "approved" },

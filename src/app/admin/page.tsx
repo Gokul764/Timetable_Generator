@@ -63,7 +63,10 @@ export default async function AdminDashboard() {
     prisma.room.count({ where: { departmentId } }),
     prisma.facultyTimeslotRequest.findMany({
         where: { faculty: { departmentId }, status: "pending" },
-        include: { faculty: { include: { user: true } } },
+        include: { 
+          faculty: { include: { user: true } },
+          targetSlot: { include: { subject: true } }
+        },
         orderBy: { createdAt: "desc" },
         take: 3
     })
@@ -209,9 +212,23 @@ export default async function AdminDashboard() {
                         </div>
                         <div>
                           <p className="font-bold text-gray-900">{req.faculty.user.name}</p>
-                          <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
-                            {DAYS[req.dayOfWeek]} @ {req.startTime}
-                          </Badge>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {req.isMoveRequest ? (
+                              <div className="flex items-center gap-1.5">
+                                <Badge variant="outline" className="text-[10px] bg-amber-50 text-amber-700 border-amber-100">
+                                  Move: {req.targetSlot?.subject?.name || "Class"}
+                                </Badge>
+                                <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                                <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
+                                  {DAYS[req.dayOfWeek]} @ {req.startTime}
+                                </Badge>
+                              </div>
+                            ) : (
+                              <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">
+                                {DAYS[req.dayOfWeek]} @ {req.startTime}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
                       {req.reason && (
@@ -221,7 +238,7 @@ export default async function AdminDashboard() {
                       )}
                     </div>
                     <div className="flex-shrink-0">
-                      <FacultyRequestActions requestId={req.id} />
+                      <FacultyRequestActions requestId={req.id} isMove={req.isMoveRequest} />
                     </div>
                   </div>
                 ))}

@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Check, X, Wand2, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function FacultyRequestActions({ requestId }: { requestId: string }) {
+export function FacultyRequestActions({ requestId, isMove }: { requestId: string; isMove?: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -42,9 +43,9 @@ export function FacultyRequestActions({ requestId }: { requestId: string }) {
       const data = await res.json().catch(() => ({}));
       
       if (!res.ok) {
-        alert(data.error ?? "Verification failed. The constraint caused conflicts.");
+        alert(data.error ?? "Verification failed.");
       } else {
-        alert("Success! Timetable re-generated with 0 conflicts. Request approved.");
+        alert(data.message ?? "Success!");
       }
       
       router.refresh();
@@ -59,38 +60,46 @@ export function FacultyRequestActions({ requestId }: { requestId: string }) {
     <div className="flex justify-end items-center gap-2">
       <Button 
         size="sm" 
-        variant="outline" 
+        variant="ghost" 
         onClick={() => updateStatus("rejected")}
         disabled={!!loading}
+        className="text-muted-foreground hover:text-destructive transition-colors h-8"
       >
-        {loading === "rejected" ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4 mr-1" />}
+        {loading === "rejected" ? <Loader2 className="h-3 w-3 animate-spin" /> : <X className="h-3 w-3 mr-1" />}
         Reject
       </Button>
 
       <Button 
         size="sm" 
-        className="bg-purple-600 hover:bg-purple-700 text-white" 
+        className={cn(
+          "h-8 px-4 font-semibold shadow-sm transition-all",
+          isMove ? "bg-amber-600 hover:bg-amber-700 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"
+        )}
         onClick={handleVerify}
         disabled={!!loading}
       >
         {loading === "verify" ? (
-          <Loader2 className="h-4 w-4 animate-spin mr-1" />
+          <Loader2 className="h-3 w-3 animate-spin mr-1" />
         ) : (
-          <Wand2 className="h-4 w-4 mr-1" />
+          <Wand2 className="h-3 w-3 mr-1" />
         )}
-        Verify & Re-generate
+        {isMove ? "Verify & Apply Move" : "Verify & Re-generate"}
       </Button>
 
-      <Button 
-        size="sm" 
-        onClick={() => updateStatus("approved")}
-        disabled={!!loading}
-        variant="ghost"
-        className="text-muted-foreground hover:text-foreground"
-      >
-        {loading === "approved" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4 mr-1" />}
-        Quick Approve
-      </Button>
+      {/* Quick Approve only for non-moves or if you trust the admin */}
+      {!isMove && (
+        <Button 
+          size="sm" 
+          onClick={() => updateStatus("approved")}
+          disabled={!!loading}
+          variant="ghost"
+          className="text-muted-foreground hover:text-foreground h-8"
+        >
+          {loading === "approved" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3 mr-1" />}
+          Quick Approve
+        </Button>
+      )}
     </div>
   );
 }
+

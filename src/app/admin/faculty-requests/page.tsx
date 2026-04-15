@@ -78,8 +78,9 @@ export default async function AdminFacultyRequestsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Faculty</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Day</TableHead>
-                <TableHead>Time</TableHead>
+                <TableHead>Target Time</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right min-w-[320px]">Actions</TableHead>
@@ -88,7 +89,7 @@ export default async function AdminFacultyRequestsPage() {
             <TableBody>
               {requests.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                     No faculty timeslot requests yet.
                   </TableCell>
                 </TableRow>
@@ -96,10 +97,26 @@ export default async function AdminFacultyRequestsPage() {
                 requests.map((r) => (
                   <TableRow key={r.id} className="group transition-colors hover:bg-muted/30">
                     <TableCell className="font-bold">{r.faculty.user.name}</TableCell>
+                    <TableCell>
+                      {r.isMoveRequest ? (
+                        <div className="flex flex-col">
+                          <Badge variant="outline" className="w-fit text-[10px] bg-amber-50 text-amber-700 border-amber-100 mb-1">
+                            MOVE
+                          </Badge>
+                          <span className="text-xs font-semibold text-muted-foreground leading-tight">
+                            {r.targetSlot?.subject?.name || "Unknown Class"}
+                          </span>
+                        </div>
+                      ) : (
+                        <Badge variant="outline" className="text-[10px] bg-sky-50 text-sky-700 border-sky-100">
+                          {r.reason?.includes("[UNAVAILABLE]") ? "UNAVAILABILITY" : "PREFERENCE"}
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{DAYS[r.dayOfWeek] ?? r.dayOfWeek}</TableCell>
                     <TableCell className="font-medium text-blue-700">{r.startTime} – {r.endTime}</TableCell>
-                    <TableCell className="max-w-[300px] text-sm text-muted-foreground italic">
-                      {r.reason || "No reason provided"}
+                    <TableCell className="max-w-[150px] text-sm text-muted-foreground italic truncate">
+                      {r.reason?.replace(/\[.*?\]\s*/, "") || "—"}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -118,7 +135,7 @@ export default async function AdminFacultyRequestsPage() {
                     <TableCell className="text-right">
                       <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                         {r.status === "pending" && (
-                          <FacultyRequestActions requestId={r.id} />
+                          <FacultyRequestActions requestId={r.id} isMove={r.isMoveRequest} />
                         )}
                       </div>
                     </TableCell>

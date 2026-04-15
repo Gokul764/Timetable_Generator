@@ -118,6 +118,8 @@ model TimetableSlot {
   room      Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
   faculty   Faculty   @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   subject   Subject?  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  moveRequests FacultyTimeslotRequest[] @relation("RequestTargetSlot")
 }
 
 model Subject {
@@ -167,6 +169,7 @@ model FacultyTimeslotRequest {
   id           String   @id @default(cuid())
   facultyId    String
   targetSlotId String?
+  isMoveRequest Boolean @default(false)
   dayOfWeek    Int
   startTime    String
   endTime      String
@@ -175,7 +178,8 @@ model FacultyTimeslotRequest {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  faculty    Faculty       @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  targetSlot TimetableSlot? @relation("RequestTargetSlot", fields: [targetSlotId], references: [id], onDelete: SetNull)
 }
 
 model Notification {

@@ -40,7 +40,13 @@ export default async function FacultyRequestSlotPage() {
           <FacultyTimeslotRequestForm
             facultyId={facultyId}
             days={[...DAYS]}
-            currentSlots={[]}
+            currentSlots={slots.map(s => ({
+              id: s.id,
+              label: `${s.subject?.name || "Unknown"} (${DAYS[s.dayOfWeek]} ${s.startTime})`,
+              dayOfWeek: s.dayOfWeek,
+              startTime: s.startTime,
+              endTime: s.endTime
+            }))}
           />
         </CardContent>
       </Card>
