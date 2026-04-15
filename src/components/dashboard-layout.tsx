@@ -2,6 +2,10 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { DashboardHeader } from "./dashboard-header";
+import { DashboardSidebar } from "./dashboard-sidebar";
+import { MobileNav } from "./mobile-nav";
+
+const ALLOWED_ROLES = ["super_admin", "admin", "faculty", "student"] as const;
 
 export default async function DashboardLayout({
   children,
