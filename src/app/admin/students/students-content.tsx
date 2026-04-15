@@ -138,110 +138,112 @@ export function StudentsContent({ initialStudents, allSubjects }: StudentsConten
 
             {/* Table Section */}
             <div className="rounded-3xl border border-border/40 bg-card/30 backdrop-blur-xl overflow-hidden shadow-xl ring-1 ring-white/10">
-                <Table>
-                    <TableHeader className="bg-muted/50">
-                        <TableRow className="hover:bg-transparent border-border/40">
-                            <TableHead className="w-[120px] font-bold text-foreground py-5">Roll No</TableHead>
-                            <TableHead className="font-bold text-foreground">Student Identity</TableHead>
-                            <TableHead className="font-bold text-foreground">Academic Status</TableHead>
-                            <TableHead className="font-bold text-foreground">Course Enrollments</TableHead>
-                            <TableHead className="w-[80px] text-right pr-6">Manage</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredStudents.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={5} className="h-64 text-center">
-                                    <div className="flex flex-col items-center justify-center space-y-3 brightness-75">
-                                        <div className="p-4 bg-muted/20 rounded-full">
-                                            <AlertCircle className="h-10 w-10 text-muted-foreground" />
-                                        </div>
-                                        <p className="text-xl font-medium text-muted-foreground">No matching students found</p>
-                                        <Button variant="link" onClick={() => { setSearch(""); setYearFilter("all"); }}>Clear all filters</Button>
-                                    </div>
-                                </TableCell>
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader className="bg-muted/50">
+                            <TableRow className="hover:bg-transparent border-border/40">
+                                <TableHead className="w-[120px] font-bold text-foreground py-5">Roll No</TableHead>
+                                <TableHead className="font-bold text-foreground">Student Identity</TableHead>
+                                <TableHead className="font-bold text-foreground">Academic Status</TableHead>
+                                <TableHead className="font-bold text-foreground">Course Enrollments</TableHead>
+                                <TableHead className="w-[80px] text-right pr-6">Manage</TableHead>
                             </TableRow>
-                        ) : (
-                            filteredStudents.map((student) => (
-                                <TableRow key={student.id} className="group hover:bg-primary/5 border-border/40 transition-colors">
-                                    <TableCell className="py-5 font-mono text-xs text-primary font-bold">
-                                        <div className="flex items-center gap-2">
-                                            <Hash className="h-3 w-3 opacity-40" />
-                                            {student.rollNo || "PENDING"}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/10 shadow-sm transition-transform group-hover:scale-110">
-                                                <User className="h-5 w-5 text-primary" />
+                        </TableHeader>
+                        <TableBody>
+                            {filteredStudents.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="h-64 text-center">
+                                        <div className="flex flex-col items-center justify-center space-y-3 brightness-75">
+                                            <div className="p-4 bg-muted/20 rounded-full">
+                                                <AlertCircle className="h-10 w-10 text-muted-foreground" />
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="font-semibold text-foreground leading-none mb-1">
-                                                    {student.user.name}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground flex items-center gap-1 group-hover:text-primary/70 transition-colors">
-                                                    <Mail className="h-3 w-3" />
-                                                    {student.user.email}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-5">
-                                        <div className="flex flex-col gap-1">
-                                            <Badge variant="secondary" className="w-fit bg-secondary/30 text-secondary-foreground border-secondary/20 rounded-lg">
-                                                Year {student.year}
-                                            </Badge>
-                                            <span className="text-[10px] text-muted-foreground/60 uppercase tracking-widest font-bold ml-1">
-                                                Active Session
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-5">
-                                        <div className="flex items-center gap-3">
-                                            {student.subjects.length > 0 ? (
-                                                <div className="flex flex-wrap gap-1.5 max-w-[300px]">
-                                                    {student.subjects.slice(0, 3).map(sub => (
-                                                        <Badge 
-                                                            key={sub.id} 
-                                                            variant="outline" 
-                                                            className="text-[10px] px-1.5 py-0 bg-background/40 border-primary/10 hover:border-primary/40 transition-colors cursor-default"
-                                                        >
-                                                            {sub.code}
-                                                        </Badge>
-                                                    ))}
-                                                    {student.subjects.length > 3 && (
-                                                        <Badge variant="outline" className="text-[10px] px-1 text-muted-foreground italic">
-                                                            +{student.subjects.length - 3} more
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-1.5 text-orange-500 bg-orange-500/10 px-2 py-1 rounded-full text-[10px] font-bold border border-orange-500/20 uppercase tracking-tighter">
-                                                    <AlertCircle className="h-3 w-3" />
-                                                    No subjects
-                                                </div>
-                                            )}
-                                            <EditStudentSubjectsDialog
-                                                studentId={student.id}
-                                                studentName={student.user.name}
-                                                enrolledSubjectIds={student.subjects.map(s => s.id)}
-                                                allSubjects={allSubjects}
-                                            />
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-5 text-right pr-6">
-                                        <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <DeleteStudentButton 
-                                                studentId={student.id} 
-                                                studentName={student.user.name} 
-                                            />
+                                            <p className="text-xl font-medium text-muted-foreground">No matching students found</p>
+                                            <Button variant="link" onClick={() => { setSearch(""); setYearFilter("all"); }}>Clear all filters</Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                            ) : (
+                                filteredStudents.map((student) => (
+                                    <TableRow key={student.id} className="group hover:bg-primary/5 border-border/40 transition-colors">
+                                        <TableCell className="py-5 font-mono text-xs text-primary font-bold">
+                                            <div className="flex items-center gap-2">
+                                                <Hash className="h-3 w-3 opacity-40" />
+                                                {student.rollNo || "PENDING"}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-5">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-primary/20 to-secondary/20 flex items-center justify-center border border-primary/10 shadow-sm transition-transform group-hover:scale-110">
+                                                    <User className="h-5 w-5 text-primary" />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-semibold text-foreground leading-none mb-1">
+                                                        {student.user.name}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground flex items-center gap-1 group-hover:text-primary/70 transition-colors">
+                                                        <Mail className="h-3 w-3" />
+                                                        {student.user.email}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-5">
+                                            <div className="flex flex-col gap-1">
+                                                <Badge variant="secondary" className="w-fit bg-secondary/30 text-secondary-foreground border-secondary/20 rounded-lg">
+                                                    Year {student.year}
+                                                </Badge>
+                                                <span className="text-[10px] text-muted-foreground/60 uppercase tracking-widest font-bold ml-1">
+                                                    Active Session
+                                                </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-5">
+                                            <div className="flex items-center gap-3">
+                                                {student.subjects.length > 0 ? (
+                                                    <div className="flex flex-wrap gap-1.5 max-w-[300px]">
+                                                        {student.subjects.slice(0, 3).map(sub => (
+                                                            <Badge 
+                                                                key={sub.id} 
+                                                                variant="outline" 
+                                                                className="text-[10px] px-1.5 py-0 bg-background/40 border-primary/10 hover:border-primary/40 transition-colors cursor-default"
+                                                            >
+                                                                {sub.code}
+                                                            </Badge>
+                                                        ))}
+                                                        {student.subjects.length > 3 && (
+                                                            <Badge variant="outline" className="text-[10px] px-1 text-muted-foreground italic">
+                                                                +{student.subjects.length - 3} more
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-1.5 text-orange-500 bg-orange-500/10 px-2 py-1 rounded-full text-[10px] font-bold border border-orange-500/20 uppercase tracking-tighter">
+                                                        <AlertCircle className="h-3 w-3" />
+                                                        No subjects
+                                                    </div>
+                                                )}
+                                                <EditStudentSubjectsDialog
+                                                    studentId={student.id}
+                                                    studentName={student.user.name}
+                                                    enrolledSubjectIds={student.subjects.map(s => s.id)}
+                                                    allSubjects={allSubjects}
+                                                />
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-5 text-right pr-6">
+                                            <div className="flex justify-end md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <DeleteStudentButton 
+                                                    studentId={student.id} 
+                                                    studentName={student.user.name} 
+                                                />
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
             
             {/* Stats Footer */}

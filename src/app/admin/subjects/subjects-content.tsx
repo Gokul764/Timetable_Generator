@@ -199,69 +199,71 @@ export function SubjectsContent({ initialSubjects }: SubjectsContentProps) {
                             </div>
 
                             <Card className="overflow-hidden border-border/50 shadow-sm">
-                                <Table>
-                                    <TableHeader className="bg-muted/30">
-                                        <TableRow>
-                                            <TableHead className="w-[100px] font-bold">Code</TableHead>
-                                            <TableHead className="font-bold">Name</TableHead>
-                                            <TableHead className="w-[100px] font-bold">Sem</TableHead>
-                                            <TableHead className="font-bold">Categories</TableHead>
-                                            <TableHead className="w-[120px] font-bold">L/W</TableHead>
-                                            <TableHead className="w-[150px] font-bold">Type</TableHead>
-                                            <TableHead className="text-right font-bold pr-6">Management</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {yearSubjects.map((subject) => (
-                                            <TableRow key={subject.id} className="hover:bg-muted/10 transition-colors">
-                                                <TableCell className="font-bold text-primary">{subject.code}</TableCell>
-                                                <TableCell className="font-medium">{subject.name}</TableCell>
-                                                <TableCell>
-                                                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-secondary text-secondary-foreground text-xs font-bold">
-                                                        S{subject.semester}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {subject.isCore && <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">Core</Badge>}
-                                                        {subject.isHonor && <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Honor</Badge>}
-                                                        {subject.isMinor && <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Minor</Badge>}
-                                                        {subject.isAddOn && <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Add-on</Badge>}
-                                                        {subject.isProfessionalElective && <Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-200">Prof.</Badge>}
-                                                        {subject.isOpenElective && <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200">Open</Badge>}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <span className="text-muted-foreground text-sm font-semibold">{subject.classesPerWeek} classes</span>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {subject.isLab ? (
-                                                        <Badge className="bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 border-indigo-200/50 flex items-center w-fit gap-1 pr-2">
-                                                            <FlaskConical className="h-3 w-3" />
-                                                            Lab ({subject.labSessionsPerWeek})
-                                                        </Badge>
-                                                    ) : (
-                                                        <Badge variant="secondary" className="flex items-center w-fit gap-1 pr-2">
-                                                            <BookOpen className="h-3 w-3" />
-                                                            Theory
-                                                        </Badge>
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="text-right pr-4">
-                                                    <div className="flex justify-end items-center gap-1">
-                                                        <SubjectStatusToggle
-                                                            subjectId={subject.id}
-                                                            initialStatus={subject.isActive}
-                                                        />
-                                                        <div className="h-4 w-px bg-border mx-1" />
-                                                        <EditSubjectDialog subject={subject as any} />
-                                                        <DeleteSubjectButton subjectId={subject.id} />
-                                                    </div>
-                                                </TableCell>
+                                <div className="overflow-x-auto">
+                                    <Table>
+                                        <TableHeader className="bg-muted/30">
+                                            <TableRow>
+                                                <TableHead className="w-[100px] font-bold">Code</TableHead>
+                                                <TableHead className="font-bold">Name</TableHead>
+                                                <TableHead className="w-[100px] font-bold">Sem</TableHead>
+                                                <TableHead className="font-bold">Categories</TableHead>
+                                                <TableHead className="w-[120px] font-bold">L/W</TableHead>
+                                                <TableHead className="w-[150px] font-bold">Type</TableHead>
+                                                <TableHead className="text-right font-bold pr-6">Management</TableHead>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {yearSubjects.map((subject) => (
+                                                <TableRow key={subject.id} className="hover:bg-muted/10 transition-colors">
+                                                    <TableCell className="font-bold text-primary">{subject.code}</TableCell>
+                                                    <TableCell className="font-medium">{subject.name}</TableCell>
+                                                    <TableCell>
+                                                        <span className="flex items-center justify-center w-7 h-7 rounded-full bg-secondary text-secondary-foreground text-xs font-bold">
+                                                            S{subject.semester}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {subject.isCore && <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">Core</Badge>}
+                                                            {subject.isHonor && <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Honor</Badge>}
+                                                            {subject.isMinor && <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Minor</Badge>}
+                                                            {subject.isAddOn && <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200">Add-on</Badge>}
+                                                            {subject.isProfessionalElective && <Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-200">Prof.</Badge>}
+                                                            {subject.isOpenElective && <Badge variant="outline" className="bg-cyan-50 text-cyan-600 border-cyan-200">Open</Badge>}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <span className="text-muted-foreground text-sm font-semibold">{subject.classesPerWeek} classes</span>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {subject.isLab ? (
+                                                            <Badge className="bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 border-indigo-200/50 flex items-center w-fit gap-1 pr-2">
+                                                                <FlaskConical className="h-3 w-3" />
+                                                                Lab ({subject.labSessionsPerWeek})
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge variant="secondary" className="flex items-center w-fit gap-1 pr-2">
+                                                                <BookOpen className="h-3 w-3" />
+                                                                Theory
+                                                            </Badge>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="text-right pr-4">
+                                                        <div className="flex justify-end items-center gap-1 md:opacity-0 group-hover:opacity-100 transition-all translate-x-4 md:group-hover:translate-x-0">
+                                                            <SubjectStatusToggle
+                                                                subjectId={subject.id}
+                                                                initialStatus={subject.isActive}
+                                                            />
+                                                            <div className="h-4 w-px bg-border mx-1" />
+                                                            <EditSubjectDialog subject={subject as any} />
+                                                            <DeleteSubjectButton subjectId={subject.id} />
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
                             </Card>
                         </div>
                     );

@@ -113,98 +113,100 @@ export function FacultyContent({ initialFaculty, allSubjects, currentDepartmentI
 
             {/* Data Table */}
             <div className="rounded-[2rem] border border-border/40 bg-card/20 backdrop-blur-xl overflow-hidden shadow-2xl ring-1 ring-white/5">
-                <Table>
-                    <TableHeader className="bg-muted/30">
-                        <TableRow className="hover:bg-transparent border-border/20">
-                            <TableHead className="w-[140px] font-bold text-foreground py-6 pl-8">Emp ID</TableHead>
-                            <TableHead className="font-bold text-foreground py-6">Faculty Profile</TableHead>
-                            <TableHead className="font-bold text-foreground py-6">Load Matrix</TableHead>
-                            <TableHead className="w-[180px] text-right font-bold text-foreground py-6 pr-8">Operations</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredFaculty.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={4} className="h-80 text-center">
-                                    <div className="flex flex-col items-center justify-center space-y-4 opacity-70">
-                                        <div className="p-6 bg-muted/20 rounded-full grayscale">
-                                            <Briefcase className="h-12 w-12 text-muted-foreground" />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-xl font-bold text-muted-foreground">No faculty members found</p>
-                                            <p className="text-sm text-muted-foreground/60">Try adjusting your search criteria</p>
-                                        </div>
-                                    </div>
-                                </TableCell>
+                <div className="overflow-x-auto">
+                    <Table>
+                        <TableHeader className="bg-muted/30">
+                            <TableRow className="hover:bg-transparent border-border/20">
+                                <TableHead className="w-[140px] font-bold text-foreground py-6 pl-8">Emp ID</TableHead>
+                                <TableHead className="font-bold text-foreground py-6">Faculty Profile</TableHead>
+                                <TableHead className="font-bold text-foreground py-6">Load Matrix</TableHead>
+                                <TableHead className="w-[180px] text-right font-bold text-foreground py-6 pr-8">Operations</TableHead>
                             </TableRow>
-                        ) : (
-                            filteredFaculty.map((f) => (
-                                <TableRow key={f.id} className="group hover:bg-indigo-500/5 border-border/20 transition-all duration-300">
-                                    <TableCell className="py-6 pl-8">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted/40 rounded-lg border border-border/40 font-mono text-xs font-bold text-primary shadow-sm">
-                                            <Hash className="h-3 w-3 opacity-50" />
-                                            {f.employeeId || "NEW-HRP"}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 flex items-center justify-center border border-indigo-500/20 shadow-lg group-hover:rotate-6 transition-transform">
-                                                <UserCircle2 className="h-6 w-6 text-indigo-500" />
+                        </TableHeader>
+                        <TableBody>
+                            {filteredFaculty.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="h-80 text-center">
+                                        <div className="flex flex-col items-center justify-center space-y-4 opacity-70">
+                                            <div className="p-6 bg-muted/20 rounded-full grayscale">
+                                                <Briefcase className="h-12 w-12 text-muted-foreground" />
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="font-bold text-lg text-foreground tracking-tight leading-none mb-1.5 flex items-center gap-2">
-                                                    {f.user.name}
-                                                    {f.subjects.length > 3 && <BadgeCheck className="h-4 w-4 text-emerald-500" />}
-                                                </span>
-                                                <span className="text-xs font-semibold text-muted-foreground/70 flex items-center gap-1.5 group-hover:text-indigo-500 transition-colors uppercase tracking-wider">
-                                                    <Briefcase className="h-3.5 w-3.5" />
-                                                    {f.designation || "Faculty Member"}
-                                                </span>
+                                            <div className="space-y-1">
+                                                <p className="text-xl font-bold text-muted-foreground">No faculty members found</p>
+                                                <p className="text-sm text-muted-foreground/60">Try adjusting your search criteria</p>
                                             </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-6">
-                                        <div className="flex flex-wrap gap-2 max-w-[400px]">
-                                            {f.subjects.length > 0 ? (
-                                                f.subjects.map(sub => (
-                                                    <Badge 
-                                                        key={sub.id} 
-                                                        variant="outline" 
-                                                        className="px-2 py-0.5 bg-background/50 border-primary/5 hover:border-primary/30 transition-colors text-[11px] font-bold"
-                                                    >
-                                                        {sub.code}
-                                                    </Badge>
-                                                ))
-                                            ) : (
-                                                <div className="flex items-center gap-2 text-[11px] font-bold text-amber-500 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20 uppercase">
-                                                    Unassigned
-                                                </div>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-6 pr-8">
-                                        <div className="flex justify-end items-center gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                                            <FacultyTimetableDialog
-                                                facultyId={f.id}
-                                                facultyName={f.user.name}
-                                            />
-                                            <AssignSubjectsDialog
-                                                faculty={f as any}
-                                                allSubjects={allSubjects}
-                                                currentDepartmentId={currentDepartmentId}
-                                            />
-                                            <div className="w-px h-6 bg-border/40 mx-1" />
-                                            <DeleteFacultyButton 
-                                                facultyId={f.id} 
-                                                facultyName={f.user.name} 
-                                            />
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                            ) : (
+                                filteredFaculty.map((f) => (
+                                    <TableRow key={f.id} className="group hover:bg-indigo-500/5 border-border/20 transition-all duration-300">
+                                        <TableCell className="py-6 pl-8">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-muted/40 rounded-lg border border-border/40 font-mono text-xs font-bold text-primary shadow-sm">
+                                                <Hash className="h-3 w-3 opacity-50" />
+                                                {f.employeeId || "NEW-HRP"}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 flex items-center justify-center border border-indigo-500/20 shadow-lg group-hover:rotate-6 transition-transform">
+                                                    <UserCircle2 className="h-6 w-6 text-indigo-500" />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-lg text-foreground tracking-tight leading-none mb-1.5 flex items-center gap-2">
+                                                        {f.user.name}
+                                                        {f.subjects.length > 3 && <BadgeCheck className="h-4 w-4 text-emerald-500" />}
+                                                    </span>
+                                                    <span className="text-xs font-semibold text-muted-foreground/70 flex items-center gap-1.5 group-hover:text-indigo-500 transition-colors uppercase tracking-wider">
+                                                        <Briefcase className="h-3.5 w-3.5" />
+                                                        {f.designation || "Faculty Member"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-6">
+                                            <div className="flex flex-wrap gap-2 max-w-[400px]">
+                                                {f.subjects.length > 0 ? (
+                                                    f.subjects.map(sub => (
+                                                        <Badge 
+                                                            key={sub.id} 
+                                                            variant="outline" 
+                                                            className="px-2 py-0.5 bg-background/50 border-primary/5 hover:border-primary/30 transition-colors text-[11px] font-bold"
+                                                        >
+                                                            {sub.code}
+                                                        </Badge>
+                                                    ))
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-[11px] font-bold text-amber-500 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20 uppercase">
+                                                        Unassigned
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-6 pr-8">
+                                            <div className="flex justify-end items-center gap-1 md:opacity-0 group-hover:opacity-100 transition-all translate-x-4 md:group-hover:translate-x-0">
+                                                <FacultyTimetableDialog
+                                                    facultyId={f.id}
+                                                    facultyName={f.user.name}
+                                                />
+                                                <AssignSubjectsDialog
+                                                    faculty={f as any}
+                                                    allSubjects={allSubjects}
+                                                    currentDepartmentId={currentDepartmentId}
+                                                />
+                                                <div className="w-px h-6 bg-border/40 mx-1" />
+                                                <DeleteFacultyButton 
+                                                    facultyId={f.id} 
+                                                    facultyName={f.user.name} 
+                                                />
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
 
             {/* Matrix Footer */}

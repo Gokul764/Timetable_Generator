@@ -174,64 +174,66 @@ export function RoomsContent({ initialRooms }: RoomsContentProps) {
             {/* Results Grid/Table */}
             <div className="grid gap-6">
                 <Card className="border-none shadow-2xl bg-card/40 backdrop-blur-sm overflow-hidden rounded-3xl border border-border/20">
-                    <Table>
-                        <TableHeader className="bg-muted/40">
-                            <TableRow className="hover:bg-transparent border-b-border/30">
-                                <TableHead className="w-[120px] font-black uppercase text-[10px] tracking-widest pl-8 py-6">Code</TableHead>
-                                <TableHead className="font-black uppercase text-[10px] tracking-widest py-6">Identity & Type</TableHead>
-                                <TableHead className="font-black uppercase text-[10px] tracking-widest py-6 text-center">Load Factor</TableHead>
-                                <TableHead className="font-black uppercase text-[10px] tracking-widest py-6">Operations Status</TableHead>
-                                <TableHead className="text-right font-black uppercase text-[10px] tracking-widest pr-8 py-6">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredRooms.map((room) => (
-                                <TableRow key={room.id} className="group hover:bg-primary/[0.03] transition-all duration-300 border-b-border/10 last:border-0">
-                                    <TableCell className="pl-8 font-black text-lg text-primary/80">{room.code}</TableCell>
-                                    <TableCell className="py-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="p-3 bg-secondary/50 rounded-xl group-hover:bg-primary/10 transition-colors">
-                                                {getRoomIcon(room.type)}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="font-bold text-base leading-none">{room.name}</p>
-                                                {getTypeBadge(room.type)}
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-center py-6">
-                                        <div className="inline-flex flex-col items-center">
-                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-muted/40 rounded-full border border-border/20 shadow-sm">
-                                                <Users className="h-3 w-3 text-muted-foreground" />
-                                                <span className="text-sm font-black">{room.capacity}</span>
-                                            </div>
-                                            <span className="text-[10px] font-bold text-muted-foreground mt-1 tracking-tighter uppercase italic">Max Capacity</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-6">
-                                        {room.isAvailable ? (
-                                            <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/15 py-1 px-3 rounded-full font-bold">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse" />
-                                                Operational
-                                            </Badge>
-                                        ) : (
-                                            <Badge variant="destructive" className="bg-rose-500/10 text-rose-600 border-rose-500/20 hover:bg-rose-500/15 py-1 px-3 rounded-full font-bold">
-                                                <span className="h-1.5 w-1.5 rounded-full bg-rose-600 mr-2" />
-                                                Offline
-                                            </Badge>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-right pr-8 py-6">
-                                        <div className="flex justify-end items-center gap-2">
-                                            <EditRoomDialog room={room as any} />
-                                            <div className="h-4 w-px bg-border/40 mx-1" />
-                                            <DeleteRoomButton roomId={room.id} roomCode={room.code} />
-                                        </div>
-                                    </TableCell>
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader className="bg-muted/40">
+                                <TableRow className="hover:bg-transparent border-b-border/30">
+                                    <TableHead className="w-[120px] font-black uppercase text-[10px] tracking-widest pl-8 py-6">Code</TableHead>
+                                    <TableHead className="font-black uppercase text-[10px] tracking-widest py-6">Identity & Type</TableHead>
+                                    <TableHead className="font-black uppercase text-[10px] tracking-widest py-6 text-center">Load Factor</TableHead>
+                                    <TableHead className="font-black uppercase text-[10px] tracking-widest py-6">Operations Status</TableHead>
+                                    <TableHead className="text-right font-black uppercase text-[10px] tracking-widest pr-8 py-6">Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredRooms.map((room) => (
+                                    <TableRow key={room.id} className="group hover:bg-primary/[0.03] transition-all duration-300 border-b-border/10 last:border-0">
+                                        <TableCell className="pl-8 font-black text-lg text-primary/80">{room.code}</TableCell>
+                                        <TableCell className="py-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-3 bg-secondary/50 rounded-xl group-hover:bg-primary/10 transition-colors">
+                                                    {getRoomIcon(room.type)}
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="font-bold text-base leading-none">{room.name}</p>
+                                                    {getTypeBadge(room.type)}
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-center py-6">
+                                            <div className="inline-flex flex-col items-center">
+                                                <div className="flex items-center gap-1.5 px-3 py-1 bg-muted/40 rounded-full border border-border/20 shadow-sm">
+                                                    <Users className="h-3 w-3 text-muted-foreground" />
+                                                    <span className="text-sm font-black">{room.capacity}</span>
+                                                </div>
+                                                <span className="text-[10px] font-bold text-muted-foreground mt-1 tracking-tighter uppercase italic">Max Capacity</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-6">
+                                            {room.isAvailable ? (
+                                                <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/15 py-1 px-3 rounded-full font-bold">
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse" />
+                                                    Operational
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="destructive" className="bg-rose-500/10 text-rose-600 border-rose-500/20 hover:bg-rose-500/15 py-1 px-3 rounded-full font-bold">
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-rose-600 mr-2" />
+                                                    Offline
+                                                </Badge>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-right pr-8 py-6">
+                                            <div className="flex justify-end items-center gap-2">
+                                                <EditRoomDialog room={room as any} />
+                                                <div className="h-4 w-px bg-border/40 mx-1" />
+                                                <DeleteRoomButton roomId={room.id} roomCode={room.code} />
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
 
                     {filteredRooms.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-24 space-y-4">

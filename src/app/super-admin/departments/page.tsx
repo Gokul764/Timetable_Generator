@@ -36,34 +36,36 @@ export default async function SuperAdminDepartments() {
           <CardDescription>Faculties and rooms count per department</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Department</TableHead>
-                <TableHead>Code</TableHead>
-                <TableHead className="text-right">Faculties</TableHead>
-                <TableHead className="text-right">Rooms</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {departments.length === 0 ? (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                    No departments yet. Run seed to add sample data.
-                  </TableCell>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Code</TableHead>
+                  <TableHead className="text-right">Faculties</TableHead>
+                  <TableHead className="text-right">Rooms</TableHead>
                 </TableRow>
-              ) : (
-                departments.map((d) => (
-                  <TableRow key={d.id}>
-                    <TableCell className="font-medium">{d.name}</TableCell>
-                    <TableCell>{d.code}</TableCell>
-                    <TableCell className="text-right">{d._count.faculty}</TableCell>
-                    <TableCell className="text-right">{d._count.rooms}</TableCell>
+              </TableHeader>
+              <TableBody>
+                {departments.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                      No departments yet. Run seed to add sample data.
+                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  departments.map((d) => (
+                    <TableRow key={d.id}>
+                      <TableCell className="font-medium">{d.name}</TableCell>
+                      <TableCell>{d.code}</TableCell>
+                      <TableCell className="text-right">{d._count.faculty}</TableCell>
+                      <TableCell className="text-right">{d._count.rooms}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

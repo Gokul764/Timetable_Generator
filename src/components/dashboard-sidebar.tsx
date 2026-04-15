@@ -54,7 +54,7 @@ export function DashboardSidebar({ role }: DashboardSidebarProps) {
   const items = SIDEBAR_ITEMS[role] || [];
 
   return (
-    <aside className="w-64 border-r bg-muted/20 fixed top-0 left-0 min-h-screen flex flex-col">
+    <aside className="hidden md:flex w-64 border-r bg-muted/20 fixed top-0 left-0 min-h-screen flex-col">
       <div className="h-16 flex items-center px-6 border-b shrink-0">
         <h1 className="font-semibold text-lg">College Timetable</h1>
       </div>
