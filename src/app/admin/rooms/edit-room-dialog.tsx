@@ -140,7 +140,7 @@ export function EditRoomDialog({ room }: EditRoomDialogProps) {
                             <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Select type" />
                             </SelectTrigger>
-                            <SelectContent dropDownMenu={true}>
+                            <SelectContent>
                                 <SelectItem value="classroom">
                                     <div className="flex items-center gap-2">
                                         <Home className="h-4 w-4 text-blue-500" />
