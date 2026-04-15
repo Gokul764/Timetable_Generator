@@ -9,6 +9,7 @@ export async function POST(req: Request) {
   if (!facultyId) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+  const body = await req.json();
   const { dayOfWeek, startTime, endTime, reason, targetSlotId } = body;
   
   if (
