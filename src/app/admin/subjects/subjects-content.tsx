@@ -64,20 +64,20 @@ export function SubjectsContent({ initialSubjects }: SubjectsContentProps) {
 
     const filteredSubjects = useMemo(() => {
         return initialSubjects.filter((s) => {
-            const matchesSearch = 
+            const matchesSearch =
                 s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 s.code.toLowerCase().includes(searchQuery.toLowerCase());
-            
-            const matchesSem = 
+
+            const matchesSem =
                 semType === "all" ? true :
-                semType === "odd" ? s.semester % 2 !== 0 :
-                s.semester % 2 === 0;
-            
-            const matchesStatus = 
+                    semType === "odd" ? s.semester % 2 !== 0 :
+                        s.semester % 2 === 0;
+
+            const matchesStatus =
                 statusFilter === "all" ? true :
-                statusFilter === "active" ? s.isActive :
-                !s.isActive;
-            
+                    statusFilter === "active" ? s.isActive :
+                        !s.isActive;
+
             const matchesLab = labOnly ? s.isLab : true;
 
             return matchesSearch && matchesSem && matchesStatus && matchesLab;
@@ -214,7 +214,7 @@ export function SubjectsContent({ initialSubjects }: SubjectsContentProps) {
                                         </TableHeader>
                                         <TableBody>
                                             {yearSubjects.map((subject) => (
-                                                <TableRow key={subject.id} className="hover:bg-muted/10 transition-colors">
+                                                <TableRow key={subject.id} className="group hover:bg-muted/10 transition-colors">
                                                     <TableCell className="font-bold text-primary">{subject.code}</TableCell>
                                                     <TableCell className="font-medium">{subject.name}</TableCell>
                                                     <TableCell>
@@ -276,7 +276,7 @@ export function SubjectsContent({ initialSubjects }: SubjectsContentProps) {
                         </div>
                         <h3 className="text-lg font-semibold">No matching subjects found</h3>
                         <p className="text-muted-foreground">Try adjusting your filters or search query.</p>
-                        <button 
+                        <button
                             onClick={() => {
                                 setSearchQuery("");
                                 setSemType("all");

@@ -140,8 +140,8 @@ async function main() {
     if (!dept) throw new Error('AIML Department not found');
 
     // 1. Delete all existing subjects in AIML (and their related data via cascade)
-    console.log("Cleaning up existing subjects for AIML...");
-    await prisma.subject.deleteMany({ where: { departmentId: dept.id } });
+    // console.log("Cleaning up existing subjects for AIML...");
+    // await prisma.subject.deleteMany({ where: { departmentId: dept.id } });
 
     const passwordHash = await hash("password", 10);
     const subjectMap = new Map<string, string>(); // code -> id
