@@ -153,10 +153,10 @@ export function FacultyContent({ initialFaculty, allSubjects, currentDepartmentI
                                                     <UserCircle2 className="h-6 w-6 text-indigo-500" />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    {/* <span className="font-bold text-lg text-foreground tracking-tight leading-none mb-1.5 flex items-center gap-2">
+                                                    <span className="font-bold text-lg text-foreground tracking-tight leading-none mb-1.5 flex items-center gap-2">
                                                         {f.user.name}
-                                                        {f.subjects.length > 3 && <BadgeCheck className="h-4 w-4 text-emerald-500" />}
-                                                    </span> */}
+                                                    {f.subjects.length > 3 && <BadgeCheck className="h-4 w-4 text-emerald-500" />}
+                                                    </span> 
                                                     <span className="text-xs font-semibold text-muted-foreground/70 flex items-center gap-1.5 group-hover:text-indigo-500 transition-colors uppercase tracking-wider">
                                                         <Briefcase className="h-3.5 w-3.5" />
                                                         {f.designation || "Faculty Member"}
